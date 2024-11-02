@@ -1,0 +1,52 @@
+name: Build and release
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Specify a test matrix of specific OS/arch pairs using GitHub's special expansion matching syntax described in
+        # [1]
+        #
+        # [1] https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow#expanding-or-adding-matrix-configurations
+        go-os-target: []
+        go-arch-target: []
+        include:
+          - go-os-target: windows
+            go-arch-target: amd64
+          # M-series macOS
+          - go-os-target: darwin
+            go-arch-target: arm64
+          # Intel-based macOS
+          - go-os-target: darwin
+            go-arch-target: amd64
+          - go-os-target: linux
+            go-arch-target: amd64
+          - go-os-target: linux
+            go-arch-target: arm64
+          - go-os-target: js
+            go-arch-target: wasm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Build all protodot other than Windows
+        run: go build -o "build/protodot-${{ matrix.go-os-target }}-${{ matrix.go-arch-target }}"
+        if: matrix.go-os-target != 'windows'
+        env:
+          GOOS=${{ matrix.go-os-target }}
+          GOARCH=${{ matrix.go-arch-target }}
+
+      - name: Build protodot for Windows with exe extension
+        run: go build -o "build/protodot-${{ matrix.go-os-target }}-${{ matrix.go-arch-target }}.exe"
+        if: matrix.go-os-target == 'windows'
+        env:
+          GOOS=${{ matrix.go-os-target }}
+          GOARCH=${{ matrix.go-arch-target }}
