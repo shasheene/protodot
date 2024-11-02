@@ -13,11 +13,11 @@ jobs:
         # [1] https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow#expanding-or-adding-matrix-configurations
         go-os-target: ["windows", "darwin", "linux"]
         go-arch-target: ["amd64", "arm64"]
-        include:
+        #include:
           # Add the JS/wasm target (standalone since it can't pair with the matrix above
           # This target takes 2m30s compared to ~20 seconds for the other targets above!
-          - go-os-target: "js"
-            go-arch-target: "wasm"
+        #  - go-os-target: "js"
+        #    go-arch-target: "wasm"
 
     steps:
       - uses: actions/checkout@v4
